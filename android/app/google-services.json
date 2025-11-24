@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001482037636",
+    "project_id": "invoice-generator-4439",
+    "storage_bucket": "invoice-generator-4439.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001482037636:android:439f28d7fcab2bc525d5d1",
+        "android_client_info": {
+          "package_name": "com.superio.sparklean_invoice.invoice_generator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBraMr4AFB2pWFdQfXzfzkcmEqxfe8Idjk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
