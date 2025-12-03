@@ -1,4 +1,4 @@
-package com.superio.sparklean_invoice.invoice_generator
+package com.superio.sparkleaninvoice
 
 import io.flutter.embedding.android.FlutterActivity
 

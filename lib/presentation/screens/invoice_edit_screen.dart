@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_generator/core/constants.dart';
 import 'package:invoice_generator/presentation/providers/providers.dart';
+import 'package:invoice_generator/presentation/widgets/document_type.dart';
 import 'package:styled_widget/styled_widget.dart';
 import '../../domain/entities/invoice.dart';
 import '../../domain/entities/item.dart';
@@ -21,6 +22,8 @@ class InvoiceEditScreen extends ConsumerStatefulWidget {
 class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
   final _customerController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+
+  DocumentType documentType = DocumentType.invoice;
 
   List<ItemEntity> _items = [];
   List<TextEditingController> _descriptionControllers = [];
@@ -77,7 +80,7 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
   void _save() {
     final invoice = InvoiceEntity(
       id: widget.invoice?.id ?? generateLocalId(),
-      type: widget.type,
+      type: InvoiceEntityType.values[documentType.index],
       date: _selectedDate,
       customerName: _customerController.text,
       number: widget.invoice?.number ?? generateInvoiceNumber(),
@@ -123,9 +126,7 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
-          widget.type == InvoiceEntityType.invoice
-              ? 'Add Invoice'
-              : 'Add Receipt',
+          'Add ${documentType == DocumentType.receipt ? 'Receipt' : 'Invoice'}',
           style: TextStyle(fontFamily: 'Times New Roman'),
         ),
       ),
@@ -135,6 +136,28 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
           child: Column(
             children: [
               SizedBox(height: 16),
+              [
+                Text(
+                  'Type: ',
+                  style: TextStyle(
+                    fontFamily: 'Times New Roman',
+                  ),
+                ),
+                DocumentTypeSelector(docTypeCallback: (type) {
+                  Future.microtask(() {
+                    setState(() {
+                      documentType = type;
+                    });
+                  });
+                })
+              ]
+                  .toColumn(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min)
+                  .padding(horizontal: 16),
+              SizedBox(
+                height: 16,
+              ),
               [
                 Text(
                   'Date: ',

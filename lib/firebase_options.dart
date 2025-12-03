@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBraMr4AFB2pWFdQfXzfzkcmEqxfe8Idjk',
-    appId: '1:1001482037636:android:439f28d7fcab2bc525d5d1',
+    appId: '1:1001482037636:android:a889f453df2d6d9925d5d1',
     messagingSenderId: '1001482037636',
     projectId: 'invoice-generator-4439',
     storageBucket: 'invoice-generator-4439.firebasestorage.app',
