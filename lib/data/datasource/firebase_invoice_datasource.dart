@@ -6,9 +6,11 @@ class FirebaseInvoiceDatasource {
   final FirebaseFirestore firestore;
   final FirebaseStorage storage;
 
-  FirebaseInvoiceDatasource({FirebaseFirestore? firestore, FirebaseStorage? storage})
-      : firestore = firestore ?? FirebaseFirestore.instance,
-        storage = storage ?? FirebaseStorage.instance;
+  FirebaseInvoiceDatasource({
+    FirebaseFirestore? firestore,
+    FirebaseStorage? storage,
+  }) : firestore = firestore ?? FirebaseFirestore.instance,
+       storage = storage ?? FirebaseStorage.instance;
 
   Future<void> saveInvoice(Map<String, dynamic> data) async {
     final id = data['id'] as String;
@@ -16,8 +18,17 @@ class FirebaseInvoiceDatasource {
   }
 
   Future<List<Map<String, dynamic>>> fetchAll() async {
-    final snap = await firestore.collection('invoices').orderBy('date', descending: true).get();
+    final snap =
+        await firestore
+            .collection('invoices')
+            .orderBy('date', descending: true)
+            .limit(50)
+            .get();
     return snap.docs.map((d) => d.data()).toList();
+  }
+
+  Future<void> deleteInvoice(String id) async {
+    await firestore.collection('invoices').doc(id).delete();
   }
 
   Future<bool> fetchEnabled() async {

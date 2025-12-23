@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:invoice_generator/core/constants.dart';
 import 'package:invoice_generator/presentation/routes/app_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive_flutter/hive_flutter.dart';
 
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  await Hive.openBox('pending_invoices');
+  // await Hive.initFlutter();
+  // await Hive.openBox('pending_invoices');
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // If you haven't generated firebase_options.dart yet: use instructions in firebase_options_instructions.txt

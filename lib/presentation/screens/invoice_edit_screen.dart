@@ -10,10 +10,18 @@ import '../../domain/entities/item.dart';
 import '../../core/utils.dart';
 
 class InvoiceEditScreen extends ConsumerStatefulWidget {
-  final InvoiceEntityType type;
+  final DocumentType type;
   final InvoiceEntity? invoice;
+  final String? lastInvoiceNo;
+  final String? lastReceiptNo;
 
-  const InvoiceEditScreen({super.key, required this.type, this.invoice});
+  const InvoiceEditScreen({
+    super.key,
+    required this.type,
+    this.invoice,
+    this.lastInvoiceNo,
+    this.lastReceiptNo,
+  });
 
   @override
   ConsumerState<InvoiceEditScreen> createState() => _InvoiceEditScreenState();
@@ -21,6 +29,7 @@ class InvoiceEditScreen extends ConsumerStatefulWidget {
 
 class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
   final _customerController = TextEditingController();
+  final _numberController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
   DocumentType documentType = DocumentType.invoice;
@@ -34,28 +43,42 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
   void initState() {
     super.initState();
 
+    String number = widget.lastInvoiceNo ?? '0';
+    _numberController.text = '${int.parse(number) + 1}';
+
+    documentType = widget.type;
+
     if (widget.invoice != null) {
       final invoice = widget.invoice!;
+
+      _numberController.text = invoice.number;
+
       _selectedDate = invoice.date;
       _customerController.text = invoice.customerName;
 
-      _items = invoice.items
-          .map((item) => ItemEntity(
-                description: item.description,
-                quantity: item.quantity,
-                amount: item.amount,
-              ))
-          .toList();
+      _items =
+          invoice.items
+              .map(
+                (item) => ItemEntity(
+                  description: item.description,
+                  quantity: item.quantity,
+                  amount: item.amount,
+                ),
+              )
+              .toList();
 
-      _descriptionControllers = _items
-          .map((e) => TextEditingController(text: e.description))
-          .toList();
-      _quantityControllers = _items
-          .map((e) => TextEditingController(text: e.quantity.toString()))
-          .toList();
-      _amountControllers = _items
-          .map((e) => TextEditingController(text: e.amount.toString()))
-          .toList();
+      _descriptionControllers =
+          _items
+              .map((e) => TextEditingController(text: e.description))
+              .toList();
+      _quantityControllers =
+          _items
+              .map((e) => TextEditingController(text: e.quantity.toString()))
+              .toList();
+      _amountControllers =
+          _items
+              .map((e) => TextEditingController(text: e.amount.toString()))
+              .toList();
     }
   }
 
@@ -83,7 +106,7 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
       type: InvoiceEntityType.values[documentType.index],
       date: _selectedDate,
       customerName: _customerController.text,
-      number: widget.invoice?.number ?? generateInvoiceNumber(),
+      number: _numberController.text,
       items: _items,
     );
 
@@ -134,121 +157,172 @@ class _InvoiceEditScreenState extends ConsumerState<InvoiceEditScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 16),
               [
-                Text(
-                  'Type: ',
-                  style: TextStyle(
-                    fontFamily: 'Times New Roman',
-                  ),
-                ),
-                DocumentTypeSelector(docTypeCallback: (type) {
-                  Future.microtask(() {
-                    setState(() {
-                      documentType = type;
-                    });
-                  });
-                })
-              ]
+                    Text(
+                      'Type: ',
+                      style: TextStyle(fontFamily: 'Times New Roman'),
+                    ),
+                    DocumentTypeSelector(
+                      selectedType: widget.type,
+                      docTypeCallback: (type) {
+                        Future.microtask(() {
+                          setState(() {
+                            documentType = type;
+                            if (widget.invoice == null) {
+                              if (documentType == DocumentType.invoice) {
+                                String number = widget.lastInvoiceNo ?? '0';
+                                _numberController.text =
+                                    '${int.parse(number) + 1}';
+                              } else {
+                                String number = widget.lastReceiptNo ?? '0';
+                                _numberController.text =
+                                    '${int.parse(number) + 1}';
+                              }
+                            }
+                          });
+                        });
+                      },
+                    ),
+                  ]
                   .toColumn(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min)
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                  )
                   .padding(horizontal: 16),
-              SizedBox(
-                height: 16,
-              ),
-              [
-                Text(
-                  'Date: ',
-                  style: TextStyle(
-                    fontFamily: 'Times New Roman',
-                  ),
-                ),
-                SizedBox(width: 16),
-                Text(formatDate(_selectedDate)),
-                Icon(Icons.arrow_drop_down_rounded)
-              ].toRow().padding(horizontal: 16).gestures(onTap: _pickDate),
               SizedBox(height: 16),
               [
-                Text('Customer Name: ',
-                    style: TextStyle(
-                      fontFamily: 'Times New Roman',
-                    )),
+                    [
+                      Text(
+                        'Date: ',
+                        style: TextStyle(fontFamily: 'Times New Roman'),
+                      ),
+                      SizedBox(width: 16),
+                      Text(formatDate(_selectedDate)),
+                      Icon(Icons.arrow_drop_down_rounded),
+                    ].toRow().expanded(),
+                    SizedBox(width: 16),
+                    [
+                      Text('#'),
+                      SizedBox(width: 8),
+                      SizedBox(
+                        width: 100,
+                        child: TextField(
+                          controller: _numberController,
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) {},
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ].toRow().expanded(),
+                  ]
+                  .toRow(mainAxisSize: MainAxisSize.max)
+                  .padding(horizontal: 16)
+                  .gestures(onTap: _pickDate),
+              SizedBox(height: 16),
+              [
+                Text(
+                  'Customer Name: ',
+                  style: TextStyle(fontFamily: 'Times New Roman'),
+                ),
                 SizedBox(width: 16),
-                TextField(controller: _customerController).expanded()
+                TextField(controller: _customerController).expanded(),
               ].toRow().padding(horizontal: 16),
               SizedBox(height: 16),
               ..._items.asMap().entries.map((entry) {
                 final index = entry.key;
                 return Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _descriptionControllers[index],
-                        onChanged: (v) => _items[index] =
-                            _items[index].copyWith(description: v),
-                        decoration:
-                            const InputDecoration(labelText: 'Description'),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    SizedBox(
-                      width: 80,
-                      child: TextField(
-                        controller: _quantityControllers[index],
-                        keyboardType: TextInputType.number,
-                        onChanged: (v) => _items[index] = _items[index]
-                            .copyWith(quantity: int.tryParse(v) ?? 1),
-                        decoration: const InputDecoration(labelText: 'Qty'),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    SizedBox(
-                      width: 80,
-                      child: TextField(
-                        controller: _amountControllers[index],
-                        keyboardType: TextInputType.number,
-                        onChanged: (v) => _items[index] = _items[index]
-                            .copyWith(amount: double.tryParse(v) ?? 0),
-                        decoration: const InputDecoration(labelText: 'Amount'),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.delete).gestures(
-                      onTap: () => _removeItem(index),
-                    ),
-                  ],
-                )
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _descriptionControllers[index],
+                            onChanged:
+                                (v) =>
+                                    _items[index] = _items[index].copyWith(
+                                      description: v,
+                                    ),
+                            decoration: const InputDecoration(
+                              labelText: 'Description',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 80,
+                          child: TextField(
+                            controller: _quantityControllers[index],
+                            keyboardType: TextInputType.number,
+                            onChanged:
+                                (v) =>
+                                    _items[index] = _items[index].copyWith(
+                                      quantity: int.tryParse(v) ?? 1,
+                                    ),
+                            decoration: const InputDecoration(labelText: 'Qty'),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 80,
+                          child: TextField(
+                            controller: _amountControllers[index],
+                            keyboardType: TextInputType.number,
+                            onChanged:
+                                (v) =>
+                                    _items[index] = _items[index].copyWith(
+                                      amount: double.tryParse(v) ?? 0,
+                                    ),
+                            decoration: const InputDecoration(
+                              labelText: 'Amount',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.delete,
+                        ).gestures(onTap: () => _removeItem(index)),
+                      ],
+                    )
                     .padding(horizontal: 16, bottom: 16, top: 8)
                     .decorated(
-                        color: Colors.white,
-                        border:
-                            Border.all(color: Colors.grey.shade300, width: 2),
-                        borderRadius: BorderRadius.circular(4))
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300, width: 2),
+                      borderRadius: BorderRadius.circular(4),
+                    )
                     .padding(all: 8);
               }),
               ElevatedButton(
-                  onPressed: _addItem,
-                  child: const Text('Add New Item',
-                      style: TextStyle(
-                        fontFamily: 'Times New Roman',
-                      ))),
+                onPressed: _addItem,
+                child: const Text(
+                  'Add New Item',
+                  style: TextStyle(fontFamily: 'Times New Roman'),
+                ),
+              ),
               const SizedBox(height: 20),
               [
-                Text("Save & Preview",
-                        style: TextStyle(
-                            color: Colors.white, fontFamily: 'Times New Roman'))
+                Text(
+                      "Save & Preview",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Times New Roman',
+                      ),
+                    )
                     .center()
                     .padding(all: 8)
                     .decorated(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(16))
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(16),
+                    )
                     .padding(right: 16)
                     .ripple()
                     .gestures(onTap: _save)
                     .expanded(),
-              ].toRow().padding(all: 16)
+              ].toRow().padding(all: 16),
             ],
           ),
         ),

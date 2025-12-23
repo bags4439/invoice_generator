@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 
-enum DocumentType {invoice, receipt }
+enum DocumentType { invoice, receipt }
 
 class DocumentTypeSelector extends StatefulWidget {
   final Function(DocumentType) docTypeCallback;
+  final DocumentType? selectedType;
 
-  const DocumentTypeSelector({super.key, required this.docTypeCallback});
+  const DocumentTypeSelector({
+    super.key,
+    required this.docTypeCallback,
+    this.selectedType,
+  });
 
   @override
   _DocumentTypeSelectorState createState() => _DocumentTypeSelectorState();
@@ -18,7 +23,11 @@ class _DocumentTypeSelectorState extends State<DocumentTypeSelector> {
   @override
   void initState() {
     super.initState();
-    widget.docTypeCallback(_selectedType);
+    if (widget.selectedType == null) {
+      widget.docTypeCallback(_selectedType);
+    } else {
+      _selectedType = widget.selectedType!;
+    }
   }
 
   @override
@@ -29,9 +38,7 @@ class _DocumentTypeSelectorState extends State<DocumentTypeSelector> {
         RadioListTile<DocumentType>(
           title: Text(
             'Invoice',
-            style: TextStyle(
-              fontFamily: 'Times New Roman',
-            ),
+            style: TextStyle(fontFamily: 'Times New Roman'),
           ),
           value: DocumentType.invoice,
           groupValue: _selectedType,
@@ -47,9 +54,7 @@ class _DocumentTypeSelectorState extends State<DocumentTypeSelector> {
         RadioListTile<DocumentType>(
           title: Text(
             'Receipt',
-            style: TextStyle(
-              fontFamily: 'Times New Roman',
-            ),
+            style: TextStyle(fontFamily: 'Times New Roman'),
           ),
           value: DocumentType.receipt,
           groupValue: _selectedType,
@@ -62,7 +67,6 @@ class _DocumentTypeSelectorState extends State<DocumentTypeSelector> {
             }
           },
         ).constrained(height: 50, width: 170),
-
       ],
     ).height(50);
   }

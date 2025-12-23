@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:hive/hive.dart';
+
+// import 'package:hive/hive.dart';
 import 'package:invoice_generator/data/datasource/firebase_invoice_datasource.dart';
 import '../../domain/entities/invoice.dart';
 import '../../domain/repositories/invoice_repository.dart';
@@ -7,7 +8,8 @@ import '../models/invoice.dart';
 
 class InvoiceRepositoryImpl implements InvoiceRepository {
   final FirebaseInvoiceDatasource datasource;
-  final Box pendingBox = Hive.box('pending_invoices');
+
+  // final Box pendingBox = Hive.box('pending_invoices');
 
   InvoiceRepositoryImpl(this.datasource);
 
@@ -19,7 +21,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
       await datasource.saveInvoice(map);
     } catch (e) {
       // store locally for later sync
-      pendingBox.put(invoice.id, jsonEncode(map));
+      // pendingBox.put(invoice.id, jsonEncode(map));
       rethrow;
     }
   }
@@ -32,17 +34,22 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
 
   @override
   Future<void> uploadPendingInvoices() async {
-    final keys = pendingBox.keys.toList();
-    for (final key in keys) {
-      final jsonStr = pendingBox.get(key) as String;
-      final map = jsonDecode(jsonStr) as Map<String, dynamic>;
-      await datasource.saveInvoice(map);
-      pendingBox.delete(key);
-    }
+    // final keys = pendingBox.keys.toList();
+    // for (final key in keys) {
+    //   final jsonStr = pendingBox.get(key) as String;
+    //   final map = jsonDecode(jsonStr) as Map<String, dynamic>;
+    //   await datasource.saveInvoice(map);
+    //   pendingBox.delete(key);
+    // }
   }
 
   @override
   Future<bool> getRemoteEnabled() async {
     return datasource.fetchEnabled();
+  }
+
+  @override
+  Future deleteInvoice(String id) async {
+    return datasource.deleteInvoice(id);
   }
 }

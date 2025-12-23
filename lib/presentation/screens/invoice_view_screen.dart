@@ -52,9 +52,10 @@ class InvoiceViewScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 32),
-                ).padding(left: 28, bottom: 8),
+                ).padding(left: 8, bottom: 2),
                 [
-                  Text('Invoice#    ${invoice.number}',
+                  Text('${invoice.type == InvoiceEntityType.invoice
+                      ? 'Invoice#': 'Receipt#'}    ${invoice.number}',
                       style: TextStyle(
                           fontFamily: 'Times New Roman',
                           fontWeight: FontWeight.bold,
@@ -79,7 +80,8 @@ class InvoiceViewScreen extends StatelessWidget {
             [
               [
                 Text(
-                  "Invoice to: ",
+                  invoice.type == InvoiceEntityType.invoice
+                      ? "Invoice to: ":"Receipt to",
                   style: TextStyle(
                       fontFamily: 'Times New Roman',
                       fontWeight: FontWeight.w500,
@@ -92,7 +94,9 @@ class InvoiceViewScreen extends StatelessWidget {
                             fontSize: 18))
                     .flexible()
               ]
-                  .toRow(crossAxisAlignment: CrossAxisAlignment.start)
+                  .toColumn(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min)
                   .padding(all: 16)
                   .expanded(),
               [
@@ -107,24 +111,32 @@ class InvoiceViewScreen extends StatelessWidget {
                   height: 4,
                 ),
                 Text(
-                  'MoMo: 0540798678',
-                  style: TextStyle(fontFamily: 'Times New Roman'),
+                  'Name: Sparklean limited',
+                  style: TextStyle(fontFamily: 'Times New Roman', fontSize: 12),
+                ),
+                Divider(),
+                Text(
+                  'MoMo: 0595532921',
+                  style: TextStyle(fontFamily: 'Times New Roman', fontSize: 14),
+                ),
+                SizedBox(
+                  height: 4,
                 ),
                 [
-                  Text(
-                    'Bank: ',
-                    style: TextStyle(fontFamily: 'Times New Roman'),
-                  ),
                   [
                     Text(
-                      'Sparklean Limited',
-                      style: TextStyle(fontFamily: 'Times New Roman'),
+                      'Bank: 2346972761010',
+                      style: TextStyle(
+                          fontFamily: 'Times New Roman', fontSize: 14),
                     ),
                     Text(
-                      '0271727127127721',
-                      style: TextStyle(fontFamily: 'Times New Roman'),
+                      'First Atlantic Bank - Madina',
+                      style: TextStyle(
+                          fontFamily: 'Times New Roman', fontSize: 12, fontStyle: FontStyle.italic),
                     )
-                  ].toColumn(mainAxisAlignment: MainAxisAlignment.start)
+                  ].toColumn(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start)
                 ].toRow(crossAxisAlignment: CrossAxisAlignment.start)
               ]
                   .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
@@ -132,13 +144,13 @@ class InvoiceViewScreen extends StatelessWidget {
                   .expanded()
             ].toRow(crossAxisAlignment: CrossAxisAlignment.start),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   [
                     SizedBox(
-                      width: 30,
+                      width: 25,
                       child:
                           textDescription(text: "SL", textColor: Colors.white),
                     ),
@@ -175,14 +187,15 @@ class InvoiceViewScreen extends StatelessWidget {
                     return [
                       [
                         SizedBox(
-                          width: 30,
+                          width: 25,
                           child: textDescription(text: "${index + 1}"),
                         ),
                         textDescription(text: i.description).expanded(),
                         SizedBox(
                           width: 80,
                           child: textDescription(
-                              text: i.amount.toStringAsFixed(2)),
+                              text:
+                                  formatAsPrice(i.amount, showCurrency: false)),
                         ),
                         SizedBox(
                           width: 30,
@@ -191,7 +204,8 @@ class InvoiceViewScreen extends StatelessWidget {
                         SizedBox(
                           width: 80,
                           child: textDescription(
-                              text: '${i.quantity * i.amount}',
+                              text: formatAsPrice(i.quantity * i.amount,
+                                  showCurrency: false),
                               textAlign: TextAlign.right),
                         )
                       ].toRow().padding(horizontal: 16, vertical: 8),
@@ -203,7 +217,7 @@ class InvoiceViewScreen extends StatelessWidget {
                   ),
                   [
                     Text(
-                      'Sub Total:   ${invoice.total.toStringAsFixed(2)}',
+                      'Sub Total:   ${formatAsPrice(invoice.total)}',
                       style: TextStyle(
                           fontFamily: 'Times New Roman',
                           fontWeight: FontWeight.bold,
@@ -215,14 +229,14 @@ class InvoiceViewScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black54)),
                     Divider(),
-                    Text('Total:   ${invoice.total.toStringAsFixed(2)}',
+                    Text('Total:   ${formatAsPrice(invoice.total)}',
                         style: TextStyle(
                             fontFamily: 'Times New Roman',
                             fontWeight: FontWeight.bold,
                             fontSize: 16))
                   ]
                       .toColumn(crossAxisAlignment: CrossAxisAlignment.end)
-                      .width(150)
+                      .width(250)
                       .padding(right: 16),
                   SizedBox(
                     height: 54,
@@ -241,7 +255,7 @@ class InvoiceViewScreen extends StatelessWidget {
               ),
             ),
           ],
-        ).expanded(),
+        ).decorated(color: Colors.white).expanded(),
         Image.asset(
             invoice.footerImageUrl ?? 'assets/images/default_footer.png'),
       ].toColumn();
@@ -255,9 +269,9 @@ class InvoiceViewScreen extends StatelessWidget {
       textAlign: textAlign,
       style: TextStyle(
           color: textColor,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           fontFamily: 'Times New Roman'),
-    ).flexible();
+    );
   }
 
   Future _captureAndShareWidget() async {
