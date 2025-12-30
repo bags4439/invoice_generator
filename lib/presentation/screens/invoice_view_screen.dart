@@ -17,6 +17,8 @@ class InvoiceViewScreen extends StatelessWidget {
 
   final GlobalKey _widgetKey = GlobalKey();
 
+  final GlobalKey _shareButtonKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +31,7 @@ class InvoiceViewScreen extends StatelessWidget {
         child: _page(), // your existing widget
       ),
       floatingActionButton: FloatingActionButton(
+        key: _shareButtonKey,
         child: Icon(Icons.share),
         onPressed: () => _captureAndShareWidget(),
       ),
@@ -51,16 +54,16 @@ class InvoiceViewScreen extends StatelessWidget {
                       fontFamily: 'Times New Roman',
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontSize: 32),
-                ).padding(left: 8, bottom: 2),
+                      fontSize: 54),
+                ).padding(left: 16, bottom: 12),
                 [
-                  Text('${invoice.type == InvoiceEntityType.invoice
-                      ? 'Invoice#': 'Receipt#'}    ${invoice.number}',
+                  Text(
+                      '${invoice.type == InvoiceEntityType.invoice ? 'Invoice#' : 'Receipt#'}    ${invoice.number}',
                       style: TextStyle(
                           fontFamily: 'Times New Roman',
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          fontSize: 12)),
+                          fontSize: 18)),
                   SizedBox(
                     height: 4,
                   ),
@@ -69,7 +72,7 @@ class InvoiceViewScreen extends StatelessWidget {
                           fontFamily: 'Times New Roman',
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          fontSize: 12))
+                          fontSize: 18))
                 ]
                     .toColumn(crossAxisAlignment: CrossAxisAlignment.end)
                     .padding(right: 16, bottom: 8)
@@ -81,24 +84,28 @@ class InvoiceViewScreen extends StatelessWidget {
               [
                 Text(
                   invoice.type == InvoiceEntityType.invoice
-                      ? "Invoice to: ":"Receipt to",
+                      ? "Invoice to: "
+                      : "Receipt to",
                   style: TextStyle(
                       fontFamily: 'Times New Roman',
                       fontWeight: FontWeight.w500,
-                      fontSize: 16),
+                      fontSize: 20),
                 ),
                 Text(invoice.customerName,
                         style: TextStyle(
                             fontFamily: 'Times New Roman',
                             fontWeight: FontWeight.bold,
-                            fontSize: 18))
+                            fontSize: 28))
                     .flexible()
               ]
                   .toColumn(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min)
-                  .padding(all: 16)
-                  .expanded(),
+                  .padding(horizontal: 16, vertical: 8)
+                  .expanded(flex: 2),
+              SizedBox(
+                width: 20,
+              ),
               [
                 Text(
                   "Payment Info",
@@ -132,7 +139,9 @@ class InvoiceViewScreen extends StatelessWidget {
                     Text(
                       'First Atlantic Bank - Madina',
                       style: TextStyle(
-                          fontFamily: 'Times New Roman', fontSize: 12, fontStyle: FontStyle.italic),
+                          fontFamily: 'Times New Roman',
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic),
                     )
                   ].toColumn(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -140,7 +149,7 @@ class InvoiceViewScreen extends StatelessWidget {
                 ].toRow(crossAxisAlignment: CrossAxisAlignment.start)
               ]
                   .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
-                  .padding(all: 16)
+                  .padding(horizontal: 16, vertical: 8)
                   .expanded()
             ].toRow(crossAxisAlignment: CrossAxisAlignment.start),
             Padding(
@@ -150,7 +159,7 @@ class InvoiceViewScreen extends StatelessWidget {
                 children: [
                   [
                     SizedBox(
-                      width: 25,
+                      width: 32,
                       child:
                           textDescription(text: "SL", textColor: Colors.white),
                     ),
@@ -158,19 +167,22 @@ class InvoiceViewScreen extends StatelessWidget {
                             text: "Item Description", textColor: Colors.white)
                         .expanded(),
                     SizedBox(
-                      width: 80,
-                      child: textDescription(
-                          text: 'Price', textColor: Colors.white),
+                      width: 16,
                     ),
                     SizedBox(
-                      width: 30,
+                      width: 100,
+                      child: textDescription(
+                          text: 'Price (₵)', textColor: Colors.white),
+                    ),
+                    SizedBox(
+                      width: 32,
                       child:
                           textDescription(text: 'Qty', textColor: Colors.white),
                     ),
                     SizedBox(
-                      width: 80,
+                      width: 120,
                       child: textDescription(
-                          text: 'Total',
+                          text: 'Total (₵)',
                           textAlign: TextAlign.right,
                           textColor: Colors.white),
                     )
@@ -179,7 +191,7 @@ class InvoiceViewScreen extends StatelessWidget {
                       .padding(horizontal: 16, vertical: 8)
                       .decorated(color: Colors.teal),
                   SizedBox(
-                    height: 16,
+                    height: 10,
                   ),
                   ...invoice.items.indexed.map((e) {
                     final index = e.$1; // the index
@@ -187,70 +199,76 @@ class InvoiceViewScreen extends StatelessWidget {
                     return [
                       [
                         SizedBox(
-                          width: 25,
+                          width: 32,
                           child: textDescription(text: "${index + 1}"),
                         ),
                         textDescription(text: i.description).expanded(),
                         SizedBox(
-                          width: 80,
+                          width: 16,
+                        ),
+                        SizedBox(
+                          width: 100,
                           child: textDescription(
                               text:
                                   formatAsPrice(i.amount, showCurrency: false)),
                         ),
                         SizedBox(
-                          width: 30,
+                          width: 32,
                           child: textDescription(text: '${i.quantity}'),
                         ),
                         SizedBox(
-                          width: 80,
+                          width: 120,
                           child: textDescription(
                               text: formatAsPrice(i.quantity * i.amount,
                                   showCurrency: false),
                               textAlign: TextAlign.right),
                         )
-                      ].toRow().padding(horizontal: 16, vertical: 8),
+                      ]
+                          .toRow(crossAxisAlignment: CrossAxisAlignment.start)
+                          .padding(horizontal: 16, vertical: 0),
                       Divider()
                     ].toColumn(crossAxisAlignment: CrossAxisAlignment.stretch);
                   }),
                   SizedBox(
-                    height: 54,
+                    height: 24,
                   ),
                   [
-                    Text(
-                      'Sub Total:   ${formatAsPrice(invoice.total)}',
-                      style: TextStyle(
-                          fontFamily: 'Times New Roman',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    Text('Tax:   0.00%',
+                    [
+                      Icon(Icons.handshake_outlined),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        'Thank you for your business',
+                        style: TextStyle(fontFamily: 'Times New Roman'),
+                      )
+                    ].toRow(mainAxisSize: MainAxisSize.min).padding(left: 16),
+                    [
+                      Text(
+                        'Sub Total:   ${formatAsPrice(invoice.total)}',
                         style: TextStyle(
                             fontFamily: 'Times New Roman',
                             fontWeight: FontWeight.bold,
-                            color: Colors.black54)),
-                    Divider(),
-                    Text('Total:   ${formatAsPrice(invoice.total)}',
-                        style: TextStyle(
-                            fontFamily: 'Times New Roman',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16))
-                  ]
-                      .toColumn(crossAxisAlignment: CrossAxisAlignment.end)
-                      .width(250)
-                      .padding(right: 16),
-                  SizedBox(
-                    height: 54,
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Thank you for your business',
-                      style: TextStyle(fontFamily: 'Times New Roman'),
-                    ),
-                  ).padding(left: 16),
-                  SizedBox(
-                    height: 54,
-                  ),
+                            fontSize: 16),
+                      ),
+                      Text('Tax:   0.00%',
+                          style: TextStyle(
+                              fontFamily: 'Times New Roman',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54)),
+                      Divider(),
+                      Text('Total:   ${formatAsPrice(invoice.total)}',
+                          style: TextStyle(
+                              fontFamily: 'Times New Roman',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16))
+                    ]
+                        .toColumn(crossAxisAlignment: CrossAxisAlignment.end)
+                        .width(250)
+                        .padding(right: 16)
+                  ].toRow(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end),
                 ],
               ),
             ),
@@ -289,10 +307,16 @@ class InvoiceViewScreen extends StatelessWidget {
       final file = await File('${tempDir.path}/invoice.png').create();
       await file.writeAsBytes(pngBytes);
 
-      // Share
-      await Share.shareXFiles([XFile(file.path)],
-          text: 'Invoice ${invoice.number}');
-    } catch (e) {
+      final RenderBox box =
+      _shareButtonKey.currentContext!.findRenderObject() as RenderBox;
+
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Invoice ${invoice.number}',
+        sharePositionOrigin:
+        box.localToGlobal(Offset.zero) & box.size,
+      );
+} catch (e) {
       print("Error capturing widget: $e");
     }
   }

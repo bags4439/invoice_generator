@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -59,11 +50,38 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB0UIM7wAhZ73WzkEE-wK1e7KfwTp3Ajpw',
-    appId: '1:1001482037636:ios:374691c046499a9425d5d1',
+    appId: '1:1001482037636:ios:694f7cb8f8f604ae25d5d1',
     messagingSenderId: '1001482037636',
     projectId: 'invoice-generator-4439',
     storageBucket: 'invoice-generator-4439.firebasestorage.app',
-    iosBundleId: 'com.superio.sparkleaninvoice.invoiceGenerator',
+    iosBundleId: 'com.superio.invoiceGenerator',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDKzOPoqYIV1i3blIFCesGykqpmX1COavs',
+    appId: '1:1001482037636:web:d02dceef5c7f683825d5d1',
+    messagingSenderId: '1001482037636',
+    projectId: 'invoice-generator-4439',
+    authDomain: 'invoice-generator-4439.firebaseapp.com',
+    storageBucket: 'invoice-generator-4439.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB0UIM7wAhZ73WzkEE-wK1e7KfwTp3Ajpw',
+    appId: '1:1001482037636:ios:694f7cb8f8f604ae25d5d1',
+    messagingSenderId: '1001482037636',
+    projectId: 'invoice-generator-4439',
+    storageBucket: 'invoice-generator-4439.firebasestorage.app',
+    iosBundleId: 'com.superio.invoiceGenerator',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDKzOPoqYIV1i3blIFCesGykqpmX1COavs',
+    appId: '1:1001482037636:web:93a8145bc2d0118f25d5d1',
+    messagingSenderId: '1001482037636',
+    projectId: 'invoice-generator-4439',
+    authDomain: 'invoice-generator-4439.firebaseapp.com',
+    storageBucket: 'invoice-generator-4439.firebasestorage.app',
   );
 
 }

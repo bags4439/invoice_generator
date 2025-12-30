@@ -39,6 +39,7 @@ class InvoiceListScreen extends ConsumerWidget {
                 ),
                 SizedBox(width: 16),
                 ListTile(
+                  leading: Icon(Icons.receipt_rounded),
                       title: Text(
                         invoice.customerName,
                         style: TextStyle(
@@ -46,7 +47,7 @@ class InvoiceListScreen extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: [
+                      trailing: [
                         Text(
                           invoice.number,
                           style: TextStyle(fontFamily: 'Times New Roman'),
@@ -59,15 +60,19 @@ class InvoiceListScreen extends ConsumerWidget {
                           formatDate(invoice.date),
                           style: TextStyle(fontFamily: 'Times New Roman'),
                         ),
+                        SizedBox(
+                          width: 1,
+                          height: 16,
+                        ).decorated(color: Colors.grey).padding(horizontal: 8),
+                        Text(
+                          formatAsPrice(invoice.total),
+                          style: TextStyle(
+                            fontFamily: 'Times New Roman',
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        )
                       ].toRow(mainAxisSize: MainAxisSize.min),
-                      trailing: Text(
-                        invoice.total.toStringAsFixed(2),
-                        style: TextStyle(
-                          fontFamily: 'Times New Roman',
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      ),
                       onTap: () {
                         context.push(
                           '/add-invoice',
