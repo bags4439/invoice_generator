@@ -1,15 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:invoice_generator/core/utils.dart';
+import 'package:invoice_generator/core/web_download.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:styled_widget/styled_widget.dart';
 import '../../domain/entities/invoice.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-
 class InvoiceViewScreen extends StatelessWidget {
   final InvoiceEntity invoice;
 
@@ -32,8 +33,8 @@ class InvoiceViewScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         key: _shareButtonKey,
-        child: Icon(Icons.share),
-        onPressed: () => _captureAndShareWidget(),
+        child: Icon(Icons.cloud_download),
+        onPressed: () => captureAndExportWidget(),
       ),
     );
   }
@@ -292,32 +293,72 @@ class InvoiceViewScreen extends StatelessWidget {
     );
   }
 
-  Future _captureAndShareWidget() async {
+  // Future _captureAndShareWidget() async {
+  //   try {
+  //     // Capture widget
+  //     RenderRepaintBoundary boundary = _widgetKey.currentContext!
+  //         .findRenderObject() as RenderRepaintBoundary;
+  //     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  //     ByteData? byteData =
+  //         await image.toByteData(format: ui.ImageByteFormat.png);
+  //     Uint8List pngBytes = byteData!.buffer.asUint8List();
+  //
+  //     // Save to temporary file
+  //     final tempDir = await getTemporaryDirectory();
+  //     final file = await File('${tempDir.path}/invoice.png').create();
+  //     await file.writeAsBytes(pngBytes);
+  //
+  //     final RenderBox box =
+  //         _shareButtonKey.currentContext!.findRenderObject() as RenderBox;
+  //
+  //     await Share.shareXFiles(
+  //       [XFile(file.path)],
+  //       text: 'Invoice ${invoice.number}',
+  //       sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+  //     );
+  //   } catch (e) {
+  //     print("Error capturing widget: $e");
+  //   }
+  // }
+
+  Future<void> captureAndExportWidget() async {
     try {
       // Capture widget
       RenderRepaintBoundary boundary = _widgetKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
+
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
-      Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-      // Save to temporary file
-      final tempDir = await getTemporaryDirectory();
-      final file = await File('${tempDir.path}/invoice.png').create();
-      await file.writeAsBytes(pngBytes);
+      if (byteData == null) return;
 
-      final RenderBox box =
-      _shareButtonKey.currentContext!.findRenderObject() as RenderBox;
+      Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Invoice ${invoice.number}',
-        sharePositionOrigin:
-        box.localToGlobal(Offset.zero) & box.size,
-      );
-} catch (e) {
-      print("Error capturing widget: $e");
+      if (kIsWeb) {
+        _downloadOnWeb(pngBytes);
+      } else {
+        await _shareOnMobile(pngBytes);
+      }
+    } catch (e) {
+      debugPrint("Error capturing widget: $e");
     }
   }
+
+  void _downloadOnWeb(Uint8List pngBytes) {
+    downloadFile(pngBytes, 'invoice_${invoice.number}.png');
+  }
+
+  Future<void> _shareOnMobile(Uint8List pngBytes) async {
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/invoice.png');
+
+    await file.writeAsBytes(pngBytes);
+
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text: 'Invoice ${invoice.number}',
+    );
+  }
+
 }
